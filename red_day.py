@@ -1,3 +1,4 @@
+import shutil
 import yfinance as yf
 import threading
 import random
@@ -13,6 +14,15 @@ progress_messages = [
     "...Calculating really complex stuff...",
     "Oh, dear, here we go again..."
 ]
+
+# Get terminal width; default to 80 columns if not available
+term_width = shutil.get_terminal_size((80, 20)).columns
+
+def center_text(text):
+    """Center every line in a given multi-line string to term_width."""
+    lines = text.splitlines()
+    centered = "\n".join(line.center(term_width) for line in lines)
+    return centered
 
 # Create an Event to signal when data fetching is done
 done_event = threading.Event()
@@ -51,7 +61,7 @@ change_str = "an increase" if change_percent > 0 else "a decrease of"
 now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 # Prepare descriptive output and select ASCII art based on price movement
-if change_percent <= -2:
+if change_percent <= 2:
     # Red day – investment signal (Mr. Monopoly in red)
     ascii_art = r"""
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣤⣤⣤⡀⠀⠀⠀⠀⠀⠀⠀⡤⠚⣉⠉⠲⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -131,5 +141,9 @@ else:
     )
     color_code = "\033[92m"  # green
 
-# Print the final descriptive message with ASCII art
-print(color_code + result_message + "\n" + ascii_art + "\033[0m")
+# Center the result message and ASCII art
+centered_result = center_text(result_message)
+centered_art = center_text(ascii_art)
+
+# Print the final descriptive message with ASCII art in color
+print(color_code + centered_result + "\n" + centered_art + "\033[0m")
